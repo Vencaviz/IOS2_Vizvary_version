@@ -10,6 +10,7 @@ struct AccountView: View {
     @StateObject private var viewModel = AccountViewModel()
     @Environment(\.dismiss) var dismiss
     @State private var navigateToLogin = false
+    @State private var isMusicMuted = false
     
     var body: some View {
         NavigationStack {
@@ -111,6 +112,11 @@ struct AccountView: View {
                     .shadow(radius: 5)
             }
             .padding(.top, 20)
+            
+            // Music Toggle for guests
+            musicToggleCard()
+                .padding(.horizontal, 20)
+                .padding(.top, 30)
         }
         .padding()
     }
@@ -191,6 +197,9 @@ struct AccountView: View {
                         backgroundColor: Color(red: 0.85, green: 0.9, blue: 0.98),
                         borderColor: Color(red: 0.4, green: 0.5, blue: 0.6)
                     )
+                    
+                    // Music Toggle
+                    musicToggleCard()
                 }
                 .padding(.horizontal, 20)
             }
@@ -225,6 +234,43 @@ struct AccountView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 15)
                         .stroke(borderColor, lineWidth: 3)
+                )
+        )
+        .shadow(radius: 3)
+    }
+    
+    // MARK: - Music Toggle Card
+    private func musicToggleCard() -> some View {
+        HStack {
+            Image(systemName: isMusicMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                .font(.title)
+                .foregroundColor(Color(red: 0.5, green: 0.3, blue: 0.6))
+                .frame(width: 40)
+                .animation(.easeInOut, value: isMusicMuted)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("MUSIC")
+                    .font(.custom("Alkatra-Bold", size: 14))
+                    .foregroundColor(.black.opacity(0.6))
+                
+                Text(isMusicMuted ? "OFF" : "ON")
+                    .font(.custom("Alkatra-Bold", size: 22))
+                    .foregroundColor(.black)
+            }
+            
+            Spacer()
+            
+            Toggle("", isOn: $isMusicMuted)
+                .labelsHidden()
+                .toggleStyle(SwitchToggleStyle(tint: Color("Primary")))
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color(red: 0.95, green: 0.9, blue: 0.98))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color(red: 0.5, green: 0.3, blue: 0.6), lineWidth: 3)
                 )
         )
         .shadow(radius: 3)
