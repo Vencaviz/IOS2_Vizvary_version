@@ -140,11 +140,18 @@ struct AccountView: View {
                 Text(user.nickname)
                     .font(.custom("Alkatra-Bold", size: 32))
                     .foregroundColor(.black)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.5)
+                    .padding(.horizontal, 30)
                 
                 // Email
                 Text(user.email)
                     .font(.custom("Alkatra-Medium", size: 18))
                     .foregroundColor(.black.opacity(0.6))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .padding(.horizontal, 30)
                     .padding(.bottom, 20)
                 
                 // Stats Cards
