@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SettingsMenuView: View {
     
@@ -78,19 +79,19 @@ struct SettingsMenuView: View {
                                 .frame(width: 30)
                             
                             Text(isMusicMuted ? "MUSIC: OFF" : "MUSIC: ON")
-                                .font(.custom("Alkatra-Bold", size: 32))
+                                .font(.custom("Alkatra-Bold", size: 20))
                                 .foregroundColor(.black)
                             
                             Spacer()
                         }
                         .padding(.horizontal, 30)
                         .padding(.vertical, 18)
-                        .frame(maxWidth: 350)
+                        .frame(maxWidth: 250)
                         .background(
-                            RoundedRectangle(cornerRadius: 25)
+                            RoundedRectangle(cornerRadius: 15)
                                 .fill(Color(red: 0.95, green: 0.9, blue: 0.98))
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 25)
+                                    RoundedRectangle(cornerRadius: 15)
                                         .stroke(Color(red: 0.5, green: 0.3, blue: 0.6), lineWidth: 5)
                                 )
                         )
