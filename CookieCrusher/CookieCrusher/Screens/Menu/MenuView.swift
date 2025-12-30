@@ -10,8 +10,10 @@ import SwiftUI
 struct SettingsMenuView: View {
     
     @StateObject private var viewModel = MenuViewModel()
+    @StateObject var authService = AuthenticationService.shared
     @State private var navigateToMap = false
     @State private var navigateToAccount = false
+    @State private var navigateToLogin = false
     
     var body: some View {
         NavigationStack{
@@ -63,13 +65,29 @@ struct SettingsMenuView: View {
                     Spacer()
                         .frame(height: 25)
                     
-                    // Log out button
-                    NavigationLink(destination: AccountView()) {
-                        MenuButton(
-                            title: "LOG OUT",
-                            backgroundColor: Color(red: 0.98, green: 0.85, blue: 0.9),
-                            borderColor: Color(red: 0.6, green: 0.4, blue: 0.5)
-                        )
+                    // Log out / Login button (dynamicky podle stavu uživatele)
+                    if authService.user?.isAnonymous == false {
+                        // Uživatel je přihlášen s emailem -> zobraz LOG OUT
+                        Button(action: {
+                            viewModel.logOut()
+                        }) {
+                            MenuButton(
+                                title: "LOG OUT",
+                                backgroundColor: Color(red: 0.98, green: 0.85, blue: 0.9),
+                                borderColor: Color(red: 0.6, green: 0.4, blue: 0.5)
+                            )
+                        }
+                    } else {
+                        // Uživatel je anonymní/guest -> zobraz LOGIN
+                        Button(action: {
+                            navigateToLogin = true
+                        }) {
+                            MenuButton(
+                                title: "LOGIN",
+                                backgroundColor: Color(red: 0.85, green: 0.9, blue: 0.98),
+                                borderColor: Color(red: 0.4, green: 0.5, blue: 0.6)
+                            )
+                        }
                     }
                     
                    
@@ -80,6 +98,9 @@ struct SettingsMenuView: View {
             .navigationBarBackButtonHidden(true)
             .navigationDestination(isPresented: $navigateToMap) {
                             MapView()
+                        }
+            .navigationDestination(isPresented: $navigateToLogin) {
+                            LoginView()
                         }
             
         }
