@@ -117,7 +117,11 @@ struct AccountView: View {
     
     // MARK: - Logged In User View
     private func loggedInUserView(user: DBUser) -> some View {
-        ScrollView {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        let dateString = dateFormatter.string(from: user.dateCreated)
+        
+        return ScrollView {
             VStack(spacing: 25) {
                 // Profile Icon
                 ZStack {
@@ -173,10 +177,6 @@ struct AccountView: View {
                     )
                     
                     // Member Since
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateStyle = .medium
-                    let dateString = dateFormatter.string(from: user.dateCreated)
-                    
                     statCard(
                         icon: "calendar",
                         title: "MEMBER SINCE",
