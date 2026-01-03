@@ -18,8 +18,10 @@ class AuthenticationService: ObservableObject {
     
     private init() {
         // Listen state change(login/logout) from Firebase
+        // Firebase automatically restores the user session
         Auth.auth().addStateDidChangeListener { _, user in
             self.user = user
+            print("🔐 Auth state changed: \(user?.uid ?? "nil") - Anonymous: \(user?.isAnonymous ?? false)")
         }
     }
     
@@ -99,34 +101,47 @@ class AuthenticationService: ObservableObject {
     }
     
     func startSession(completion: @escaping () -> Void = {}) {
-            if user != nil { return }
+        // Check if user is already signed in (Firebase persistence)
+        if let currentUser = Auth.auth().currentUser {
+            print("✅ User already signed in: \(currentUser.uid)")
+            self.user = currentUser
+            self.isLoading = false
+            completion()
+            return
+        }
+        
+        // No user found, create anonymous session
+        print("🆕 Creating new anonymous session")
+        isLoading = true
+        
+        Auth.auth().signInAnonymously { [weak self] result, error in
+            guard let self = self else { return }
             
-            isLoading = true
+            if let error = error {
+                print("❌ Chyba Auth: \(error.localizedDescription)")
+                self.errorMessage = error.localizedDescription
+                self.isLoading = false
+                completion()
+                return
+            }
             
-            Auth.auth().signInAnonymously { [weak self] result, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    print("Chyba Auth: \(error.localizedDescription)")
-                    self.errorMessage = error.localizedDescription
+            guard let uid = result?.user.uid else {
+                self.isLoading = false
+                completion()
+                return
+            }
+            
+            print("✅ Anonymous sign in successful: \(uid)")
+            
+            DatabaseService.shared.checkOrCreateGuest(uid: uid) { success in
+                DispatchQueue.main.async {
                     self.isLoading = false
-                    return
-                }
-                
-                guard let uid = result?.user.uid else { return }
-                
-                DatabaseService.shared.checkOrCreateGuest(uid: uid) { success in
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                        if !success {
-                            print("Nepodařilo se ověřit uživatele v DB")
-                        }
+                    if !success {
+                        print("⚠️ Nepodařilo se ověřit uživatele v DB")
                     }
-                    DispatchQueue.main.async {
-                            self.isLoading = false
-                            completion()
-                        }
+                    completion()
                 }
             }
         }
+    }
 }
