@@ -23,15 +23,12 @@ struct CookieCrusherApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var authService = AuthenticationService.shared
     
-    @State private var isFirstLaunch = true
+    @State private var isCheckingAuth = true
     
     var body: some Scene {
         WindowGroup {
-            if authService.user != nil {
-                MapView()
-                    .transition(.opacity)
-            }
-            else if isFirstLaunch {
+            if isCheckingAuth {
+                // Loading screen while checking auth state
                 ZStack {
                     Image("menu_bg")
                         .resizable()
@@ -41,17 +38,25 @@ struct CookieCrusherApp: App {
                     VStack {
                         ProgressView()
                             .scaleEffect(1.5)
+                            .tint(.white)
                     }
                 }
                 .onAppear {
+                    // Give Firebase time to restore session
                     authService.startSession {
                         withAnimation {
-                            isFirstLaunch = false
+                            isCheckingAuth = false
                         }
                     }
                 }
             }
+            else if authService.user != nil {
+                // User is signed in (anonymous or registered)
+                MapView()
+                    .transition(.opacity)
+            }
             else {
+                // No user - show login (shouldn't happen with startSession)
                 LoginView()
                     .transition(.opacity)
             }

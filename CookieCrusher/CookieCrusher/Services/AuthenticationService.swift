@@ -18,8 +18,10 @@ class AuthenticationService: ObservableObject {
     
     private init() {
         // Listen state change(login/logout) from Firebase
+        // Firebase automatically restores the user session
         Auth.auth().addStateDidChangeListener { _, user in
             self.user = user
+            print("🔐 Auth state changed: \(user?.uid ?? "nil") - Anonymous: \(user?.isAnonymous ?? false)")
         }
     }
     
@@ -63,35 +65,83 @@ class AuthenticationService: ObservableObject {
         try? Auth.auth().signOut()
     }
     
-    func startSession(completion: @escaping () -> Void = {}) {
-            if user != nil { return }
+    func linkAnonymousAccount(email: String, pass: String, completion: @escaping (Bool, String?) -> Void) {
+        // Validate inputs
+        guard !email.isEmpty, !pass.isEmpty else {
+            completion(false, "Email a heslo nesmí být prázdné")
+            return
+        }
+        
+        guard let currentUser = Auth.auth().currentUser else {
+            completion(false, "Žádný přihlášený uživatel")
+            return
+        }
+        
+        guard currentUser.isAnonymous else {
+            completion(false, "Uživatel není anonymní")
+            return
+        }
+        
+        // Create credential on main thread
+        DispatchQueue.main.async {
+            let credential = EmailAuthProvider.credential(withEmail: email, password: pass)
             
-            isLoading = true
-            
-            Auth.auth().signInAnonymously { [weak self] result, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    print("Chyba Auth: \(error.localizedDescription)")
-                    self.errorMessage = error.localizedDescription
-                    self.isLoading = false
-                    return
-                }
-                
-                guard let uid = result?.user.uid else { return }
-                
-                DatabaseService.shared.checkOrCreateGuest(uid: uid) { success in
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                        if !success {
-                            print("Nepodařilo se ověřit uživatele v DB")
-                        }
+            currentUser.link(with: credential) { [weak self] result, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self?.errorMessage = error.localizedDescription
+                        completion(false, error.localizedDescription)
+                        return
                     }
-                    DispatchQueue.main.async {
-                            self.isLoading = false
-                            completion()
-                        }
+                    self?.errorMessage = ""
+                    completion(true, nil)
                 }
             }
         }
+    }
+    
+    func startSession(completion: @escaping () -> Void = {}) {
+        // Check if user is already signed in (Firebase persistence)
+        if let currentUser = Auth.auth().currentUser {
+            print("✅ User already signed in: \(currentUser.uid)")
+            self.user = currentUser
+            self.isLoading = false
+            completion()
+            return
+        }
+        
+        // No user found, create anonymous session
+        print("🆕 Creating new anonymous session")
+        isLoading = true
+        
+        Auth.auth().signInAnonymously { [weak self] result, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("❌ Chyba Auth: \(error.localizedDescription)")
+                self.errorMessage = error.localizedDescription
+                self.isLoading = false
+                completion()
+                return
+            }
+            
+            guard let uid = result?.user.uid else {
+                self.isLoading = false
+                completion()
+                return
+            }
+            
+            print("✅ Anonymous sign in successful: \(uid)")
+            
+            DatabaseService.shared.checkOrCreateGuest(uid: uid) { success in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    if !success {
+                        print("⚠️ Nepodařilo se ověřit uživatele v DB")
+                    }
+                    completion()
+                }
+            }
+        }
+    }
 }
