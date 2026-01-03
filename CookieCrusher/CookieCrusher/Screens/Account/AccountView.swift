@@ -26,16 +26,27 @@ struct AccountView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(.black)
-                            .padding()
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                                .font(.title2)
+                                .bold()
+                            Text("BACK")
+                                .font(.custom("Alkatra-Bold", size: 18))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color("Primary"))
+                        )
+                        .shadow(radius: 3)
                     }
                     
                     Spacer()
                 }
-                .padding(.horizontal, 10)
-                .padding(.top, 10)
+                .padding(.horizontal, 15)
+                .padding(.top, 15)
                 
                 Spacer()
                     .frame(height: 20)
