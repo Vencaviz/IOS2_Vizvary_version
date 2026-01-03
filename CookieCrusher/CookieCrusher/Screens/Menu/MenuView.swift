@@ -57,7 +57,9 @@ struct SettingsMenuView: View {
                  
                     
                     // Account button
-                    NavigationLink(destination: AccountView()) {
+                    Button(action: {
+                        navigateToAccount = true
+                    }) {
                         MenuButton(
                             title: "ACCOUNT",
                             backgroundColor: Color(red: 0.8, green: 0.95, blue: 0.8),
@@ -136,6 +138,9 @@ struct SettingsMenuView: View {
             .navigationBarBackButtonHidden(true)
             .navigationDestination(isPresented: $navigateToMap) {
                 MapView()
+            }
+            .navigationDestination(isPresented: $navigateToAccount) {
+                AccountView()
             }
             .sheet(isPresented: $showLoginSheet) {
                 LoginModalView(showRegisterSheet: $showRegisterSheet)
