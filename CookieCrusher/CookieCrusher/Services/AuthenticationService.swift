@@ -64,6 +64,12 @@ class AuthenticationService: ObservableObject {
     }
     
     func linkAnonymousAccount(email: String, pass: String, completion: @escaping (Bool, String?) -> Void) {
+        // Validate inputs
+        guard !email.isEmpty, !pass.isEmpty else {
+            completion(false, "Email a heslo nesmí být prázdné")
+            return
+        }
+        
         guard let currentUser = Auth.auth().currentUser else {
             completion(false, "Žádný přihlášený uživatel")
             return
@@ -74,16 +80,21 @@ class AuthenticationService: ObservableObject {
             return
         }
         
-        let credential = EmailAuthProvider.credential(withEmail: email, password: pass)
-        
-        currentUser.link(with: credential) { result, error in
-            if let error = error {
-                self.errorMessage = error.localizedDescription
-                completion(false, error.localizedDescription)
-                return
+        // Create credential on main thread
+        DispatchQueue.main.async {
+            let credential = EmailAuthProvider.credential(withEmail: email, password: pass)
+            
+            currentUser.link(with: credential) { [weak self] result, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self?.errorMessage = error.localizedDescription
+                        completion(false, error.localizedDescription)
+                        return
+                    }
+                    self?.errorMessage = ""
+                    completion(true, nil)
+                }
             }
-            self.errorMessage = ""
-            completion(true, nil)
         }
     }
     
