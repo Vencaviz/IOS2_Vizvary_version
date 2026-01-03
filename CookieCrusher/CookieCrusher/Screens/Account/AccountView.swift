@@ -13,67 +13,65 @@ struct AccountView: View {
     @State private var showRegisterSheet = false
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background image
-                Image("menu_bg")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                
-                VStack(spacing: 0) {
-                    // Top bar with back button
-                    HStack {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.title2)
-                                .foregroundColor(.black)
-                                .padding()
-                        }
-                        
-                        Spacer()
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.top, 10)
-                    
-                    Spacer()
-                        .frame(height: 40)
-                    
-                    // Account title
-                    Text("ACCOUNT")
-                        .font(.custom("Alkatra-Bold", size: 50))
-                        .foregroundColor(.black)
-                        .padding(.bottom, 40)
-                    
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .scaleEffect(1.5)
+        ZStack {
+            // Background image
+            Image("menu_bg")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Top bar with back button
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundColor(.black)
                             .padding()
-                    } else if viewModel.isAnonymous {
-                        // Anonymous user - show login prompt
-                        anonymousUserView
-                    } else if let user = viewModel.user {
-                        // Logged in user - show data
-                        loggedInUserView(user: user)
-                    } else {
-                        // Error state
-                        Text("Failed to load account data")
-                            .foregroundColor(.red)
-                            .font(.custom("Alkatra-Medium", size: 18))
                     }
                     
                     Spacer()
                 }
+                .padding(.horizontal, 10)
+                .padding(.top, 10)
+                
+                Spacer()
+                    .frame(height: 40)
+                
+                // Account title
+                Text("ACCOUNT")
+                    .font(.custom("Alkatra-Bold", size: 50))
+                    .foregroundColor(.black)
+                    .padding(.bottom, 40)
+                
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .padding()
+                } else if viewModel.isAnonymous {
+                    // Anonymous user - show login prompt
+                    anonymousUserView
+                } else if let user = viewModel.user {
+                    // Logged in user - show data
+                    loggedInUserView(user: user)
+                } else {
+                    // Error state
+                    Text("Failed to load account data")
+                        .foregroundColor(.red)
+                        .font(.custom("Alkatra-Medium", size: 18))
+                }
+                
+                Spacer()
             }
-            .navigationBarBackButtonHidden(true)
-            .sheet(isPresented: $showLoginSheet) {
-                LoginModalView(showRegisterSheet: $showRegisterSheet)
-            }
-            .sheet(isPresented: $showRegisterSheet) {
-                RegisterModalView()
-            }
+        }
+        .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: $showLoginSheet) {
+            LoginModalView(showRegisterSheet: $showRegisterSheet)
+        }
+        .sheet(isPresented: $showRegisterSheet) {
+            RegisterModalView()
         }
     }
     
