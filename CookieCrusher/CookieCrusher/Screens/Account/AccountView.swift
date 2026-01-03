@@ -92,7 +92,7 @@ struct AccountView: View {
                 .font(.custom("Alkatra-Medium", size: 16))
                 .foregroundColor(.black.opacity(0.7))
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 80)
             
             Button(action: {
                 showRegisterSheet = true
@@ -157,7 +157,7 @@ struct AccountView: View {
                     .padding(.bottom, 10)
                 
                 // Stats Cards
-                VStack(spacing: 12) {
+                VStack(spacing: 15) {
                     // Current Level
                     statCard(
                         icon: "flag.fill",
@@ -165,7 +165,7 @@ struct AccountView: View {
                         value: "\(user.currentLevel)",
                         backgroundColor: Color(red: 0.8, green: 0.95, blue: 0.8),
                         borderColor: Color(red: 0.4, green: 0.5, blue: 0.4)
-                    )
+                    ).padding(.horizontal, 25)
                     
                     // Highest Score
                     statCard(
@@ -174,7 +174,7 @@ struct AccountView: View {
                         value: "\(user.highestScore)",
                         backgroundColor: Color(red: 0.98, green: 0.9, blue: 0.7),
                         borderColor: Color(red: 0.7, green: 0.6, blue: 0.3)
-                    )
+                    ).padding(.horizontal, 25)
                     
                     // Lives
                     statCard(
@@ -183,7 +183,7 @@ struct AccountView: View {
                         value: "\(user.lives)",
                         backgroundColor: Color(red: 0.98, green: 0.85, blue: 0.9),
                         borderColor: Color(red: 0.6, green: 0.4, blue: 0.5)
-                    )
+                    ).padding(.horizontal, 25)
                     
                     // Member Since
                     statCard(
@@ -192,9 +192,19 @@ struct AccountView: View {
                         value: dateString,
                         backgroundColor: Color(red: 0.85, green: 0.9, blue: 0.98),
                         borderColor: Color(red: 0.4, green: 0.5, blue: 0.6)
-                    )
+                    ).padding(.horizontal, 25)
+                    
+                    Button(action: {
+                        AuthenticationService.shared.signOut()
+                    }) {
+                        MenuButton(
+                            title: "LOG OUT",
+                            backgroundColor: Color(red: 0.98, green: 0.85, blue: 0.9),
+                            borderColor: Color(red: 0.6, green: 0.4, blue: 0.5)
+                        )
+                    }
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 80)
             }
             .padding(.vertical, 15)
         }
