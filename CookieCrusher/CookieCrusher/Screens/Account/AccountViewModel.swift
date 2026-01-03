@@ -15,8 +15,17 @@ class AccountViewModel: ObservableObject {
     @Published var isAnonymous: Bool = true
     @Published var errorMessage: String = ""
     
+    private var cancellables = Set<AnyCancellable>()
+    
     init() {
         fetchUserData()
+        
+        // Listen to auth state changes
+        AuthenticationService.shared.$user
+            .sink { [weak self] _ in
+                self?.fetchUserData()
+            }
+            .store(in: &cancellables)
     }
     
     func fetchUserData() {
