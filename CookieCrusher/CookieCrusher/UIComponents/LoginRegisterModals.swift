@@ -157,8 +157,8 @@ struct RegisterModalView: View {
                 Spacer()
             }
         }
-        .onChange(of: AuthenticationService.shared.user) { oldValue, newValue in
-            if newValue != nil && oldValue?.isAnonymous == true {
+        .onChange(of: viewModel.registrationSuccess) { _, success in
+            if success {
                 dismiss()
             }
         }

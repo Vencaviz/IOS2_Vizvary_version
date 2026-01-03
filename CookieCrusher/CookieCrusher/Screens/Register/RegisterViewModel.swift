@@ -17,6 +17,7 @@ class RegisterViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var showError = false
     @Published var errorMessage = ""
+    @Published var registrationSuccess = false
     
     var isValid: Bool {
         return !nickname.isEmpty && !email.isEmpty && password.count >= 6
@@ -50,11 +51,13 @@ class RegisterViewModel: ObservableObject {
                         DatabaseService.shared.updateUserCredentials(uid: uid, email: self.email, nickname: self.nickname) { dbSuccess in
                             DispatchQueue.main.async {
                                 self.isLoading = false
-                                if !dbSuccess {
+                                if dbSuccess {
+                                    // Success - set flag to dismiss modal
+                                    self.registrationSuccess = true
+                                } else {
                                     self.errorMessage = "Účet vytvořen, ale nepodařilo se uložit data."
                                     self.showError = true
                                 }
-                                // Success - modal will auto-dismiss via onChange in AccountView
                             }
                         }
                     } else {
@@ -81,6 +84,8 @@ class RegisterViewModel: ObservableObject {
                         DispatchQueue.main.async {
                             self.isLoading = false
                             if dbSuccess {
+                                // Success - set flag to dismiss modal
+                                self.registrationSuccess = true
                             } else {
                                 self.errorMessage = "Účet vytvořen, ale nepodařilo se uložit data."
                                 self.showError = true

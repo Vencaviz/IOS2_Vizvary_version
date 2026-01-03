@@ -38,13 +38,13 @@ struct AccountView: View {
                 .padding(.top, 10)
                 
                 Spacer()
-                    .frame(height: 40)
+                    .frame(height: 20)
                 
                 // Account title
                 Text("ACCOUNT")
-                    .font(.custom("Alkatra-Bold", size: 50))
+                    .font(.custom("Alkatra-Bold", size: 45))
                     .foregroundColor(.black)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 20)
                 
                 if viewModel.isLoading {
                     ProgressView()
@@ -77,31 +77,31 @@ struct AccountView: View {
     
     // MARK: - Anonymous User View
     private var anonymousUserView: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: 20) {
             Image(systemName: "person.crop.circle.badge.questionmark")
-                .font(.system(size: 80))
+                .font(.system(size: 70))
                 .foregroundColor(.black.opacity(0.6))
             
             Text("You are playing as a Guest")
-                .font(.custom("Alkatra-Bold", size: 26))
+                .font(.custom("Alkatra-Bold", size: 24))
                 .foregroundColor(.black)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+            
+            Text("Register to save your progress and compete on the leaderboard!")
+                .font(.custom("Alkatra-Medium", size: 16))
+                .foregroundColor(.black.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
             
-            Text("Login to save your progress and compete on the leaderboard!")
-                .font(.custom("Alkatra-Medium", size: 18))
-                .foregroundColor(.black.opacity(0.7))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 80)
-            
             Button(action: {
-                showLoginSheet = true
+                showRegisterSheet = true
             }) {
-                Text("LOGIN NOW")
-                    .font(.custom("Alkatra-Bold", size: 24))
+                Text("REGISTER NOW")
+                    .font(.custom("Alkatra-Bold", size: 22))
                     .foregroundColor(.white)
-                    .padding(.horizontal, 50)
-                    .padding(.vertical, 15)
+                    .padding(.horizontal, 40)
+                    .padding(.vertical, 14)
                     .background(
                         RoundedRectangle(cornerRadius: 25)
                             .fill(Color("Primary"))
@@ -112,9 +112,9 @@ struct AccountView: View {
                     )
                     .shadow(radius: 5)
             }
-            .padding(.top, 20)
+            .padding(.top, 10)
         }
-        .padding()
+        .padding(.horizontal, 20)
     }
     
     // MARK: - Logged In User View
@@ -124,40 +124,40 @@ struct AccountView: View {
         let dateString = dateFormatter.string(from: user.dateCreated)
         
         return ScrollView {
-            VStack(spacing: 25) {
+            VStack(spacing: 20) {
                 // Profile Icon
                 ZStack {
                     Circle()
                         .fill(Color("Primary"))
-                        .frame(width: 100, height: 100)
+                        .frame(width: 90, height: 90)
                         .shadow(radius: 5)
                     
                     Image(systemName: "person.fill")
-                        .font(.system(size: 50))
+                        .font(.system(size: 45))
                         .foregroundColor(.white)
                 }
-                .padding(.bottom, 10)
+                .padding(.bottom, 5)
                 
                 // Nickname
                 Text(user.nickname)
-                    .font(.custom("Alkatra-Bold", size: 32))
+                    .font(.custom("Alkatra-Bold", size: 28))
                     .foregroundColor(.black)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.5)
-                    .padding(.horizontal, 30)
+                    .padding(.horizontal, 25)
                 
                 // Email
                 Text(user.email)
-                    .font(.custom("Alkatra-Medium", size: 18))
+                    .font(.custom("Alkatra-Medium", size: 16))
                     .foregroundColor(.black.opacity(0.6))
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .padding(.horizontal, 30)
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, 25)
+                    .padding(.bottom, 10)
                 
                 // Stats Cards
-                VStack(spacing: 15) {
+                VStack(spacing: 12) {
                     // Current Level
                     statCard(
                         icon: "flag.fill",
@@ -196,7 +196,7 @@ struct AccountView: View {
                 }
                 .padding(.horizontal, 20)
             }
-            .padding(.vertical, 20)
+            .padding(.vertical, 15)
         }
     }
     
@@ -204,24 +204,24 @@ struct AccountView: View {
     private func statCard(icon: String, title: String, value: String, backgroundColor: Color, borderColor: Color) -> some View {
         HStack {
             Image(systemName: icon)
-                .font(.title)
+                .font(.title2)
                 .foregroundColor(borderColor)
-                .frame(width: 40)
+                .frame(width: 35)
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.custom("Alkatra-Bold", size: 14))
+                    .font(.custom("Alkatra-Bold", size: 13))
                     .foregroundColor(.black.opacity(0.6))
                 
                 Text(value)
-                    .font(.custom("Alkatra-Bold", size: 22))
+                    .font(.custom("Alkatra-Bold", size: 20))
                     .foregroundColor(.black)
-                   
             }
             
             Spacer()
         }
-        .padding()
+        .padding(.horizontal, 15)
+        .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 15)
                 .fill(backgroundColor)
