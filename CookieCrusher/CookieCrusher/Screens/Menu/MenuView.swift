@@ -14,7 +14,8 @@ struct SettingsMenuView: View {
     @StateObject var authService = AuthenticationService.shared
     @State private var navigateToMap = false
     @State private var navigateToAccount = false
-    @State private var navigateToLogin = false
+    @State private var showLoginSheet = false
+    @State private var showRegisterSheet = false
     @State private var isMusicMuted = false
     
     var body: some View {
@@ -117,7 +118,7 @@ struct SettingsMenuView: View {
                     } else {
                         // Uživatel je anonymní/guest -> zobraz LOGIN
                         Button(action: {
-                            navigateToLogin = true
+                            showLoginSheet = true
                         }) {
                             MenuButton(
                                 title: "LOGIN",
@@ -134,12 +135,14 @@ struct SettingsMenuView: View {
             }
             .navigationBarBackButtonHidden(true)
             .navigationDestination(isPresented: $navigateToMap) {
-                            MapView()
-                        }
-            .navigationDestination(isPresented: $navigateToLogin) {
-                            LoginView()
-                        }
-            
+                MapView()
+            }
+            .sheet(isPresented: $showLoginSheet) {
+                LoginModalView(showRegisterSheet: $showRegisterSheet)
+            }
+            .sheet(isPresented: $showRegisterSheet) {
+                RegisterModalView()
+            }
         }
     }
 }
