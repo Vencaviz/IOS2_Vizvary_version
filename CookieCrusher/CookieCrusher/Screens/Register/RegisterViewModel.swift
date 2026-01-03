@@ -31,34 +31,70 @@ class RegisterViewModel: ObservableObject {
         
         isLoading = true
         
-        AuthenticationService.shared.register(email: email, pass: password) { [weak self] success in
-                    guard let self = self else { return }
-                    
+        // Check if current user is anonymous
+        if let currentUser = Auth.auth().currentUser, currentUser.isAnonymous {
+            // Link anonymous account to preserve game data
+            AuthenticationService.shared.linkAnonymousAccount(email: email, pass: password) { [weak self] success, error in
+                guard let self = self else { return }
+                
+                DispatchQueue.main.async {
                     if success {
+                        // Update email and nickname in existing Firestore document
                         guard let uid = Auth.auth().currentUser?.uid else {
                             self.errorMessage = "Chyba při registraci"
+                            self.showError = true
+                            self.isLoading = false
                             return
                         }
                         
-                        let newUser = DBUser(id: uid, email: self.email, nickname: self.nickname)
-                        
-                        DatabaseService.shared.saveUser(user: newUser) { dbSuccess in
+                        DatabaseService.shared.updateUserCredentials(uid: uid, email: self.email, nickname: self.nickname) { dbSuccess in
                             DispatchQueue.main.async {
                                 self.isLoading = false
-                                if dbSuccess {
-                                } else {
+                                if !dbSuccess {
                                     self.errorMessage = "Účet vytvořen, ale nepodařilo se uložit data."
                                     self.showError = true
                                 }
+                                // Success - modal will auto-dismiss via onChange in AccountView
                             }
                         }
                     } else {
-                        DispatchQueue.main.async {
-                            self.isLoading = false
-                            self.errorMessage = AuthenticationService.shared.errorMessage
-                            self.showError = true
-                        }
+                        self.isLoading = false
+                        self.errorMessage = error ?? "Neznámá chyba"
+                        self.showError = true
                     }
                 }
+            }
+        } else {
+            // Normal registration flow (user is not anonymous)
+            AuthenticationService.shared.register(email: email, pass: password) { [weak self] success in
+                guard let self = self else { return }
+                
+                if success {
+                    guard let uid = Auth.auth().currentUser?.uid else {
+                        self.errorMessage = "Chyba při registraci"
+                        return
+                    }
+                    
+                    let newUser = DBUser(id: uid, email: self.email, nickname: self.nickname)
+                    
+                    DatabaseService.shared.saveUser(user: newUser) { dbSuccess in
+                        DispatchQueue.main.async {
+                            self.isLoading = false
+                            if dbSuccess {
+                            } else {
+                                self.errorMessage = "Účet vytvořen, ale nepodařilo se uložit data."
+                                self.showError = true
+                            }
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.isLoading = false
+                        self.errorMessage = AuthenticationService.shared.errorMessage
+                        self.showError = true
+                    }
+                }
+            }
+        }
     }
 }

@@ -63,6 +63,30 @@ class AuthenticationService: ObservableObject {
         try? Auth.auth().signOut()
     }
     
+    func linkAnonymousAccount(email: String, pass: String, completion: @escaping (Bool, String?) -> Void) {
+        guard let currentUser = Auth.auth().currentUser else {
+            completion(false, "Žádný přihlášený uživatel")
+            return
+        }
+        
+        guard currentUser.isAnonymous else {
+            completion(false, "Uživatel není anonymní")
+            return
+        }
+        
+        let credential = EmailAuthProvider.credential(withEmail: email, password: pass)
+        
+        currentUser.link(with: credential) { result, error in
+            if let error = error {
+                self.errorMessage = error.localizedDescription
+                completion(false, error.localizedDescription)
+                return
+            }
+            self.errorMessage = ""
+            completion(true, nil)
+        }
+    }
+    
     func startSession(completion: @escaping () -> Void = {}) {
             if user != nil { return }
             

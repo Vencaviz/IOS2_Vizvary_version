@@ -187,4 +187,19 @@ class DatabaseService {
       }
     }
   }
+    
+  func updateUserCredentials(uid: String, email: String, nickname: String, completion: @escaping (Bool) -> Void) {
+    db.collection("users").document(uid).updateData([
+      "email": email,
+      "nickname": nickname
+    ]) { error in
+      if let error = error {
+        print("Chyba aktualizace credentials: \(error.localizedDescription)")
+        completion(false)
+      } else {
+        print("Credentials úspěšně aktualizovány!")
+        completion(true)
+      }
+    }
+  }
 }
