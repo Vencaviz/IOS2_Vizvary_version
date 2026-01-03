@@ -18,7 +18,7 @@ struct MenuButton: View {
     
     var body: some View {
         Text(title)
-            .font(.system(size: fontSize, weight: .bold))
+            
             .foregroundColor(.black)
             .frame(maxWidth: width)
             .padding(.vertical, 18)
@@ -26,9 +26,11 @@ struct MenuButton: View {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(backgroundColor)
             )
+            .font(.custom("Alkatra-Bold", size: 20))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(borderColor, lineWidth: borderWidth)
             )
     }
 }
+
